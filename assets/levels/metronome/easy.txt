@@ -1,0 +1,8 @@
+72 0:tap
+670 0:tap
+1254 0:tap
+1866 0:tap
+2458 0:tap 5:tap
+3066 1:tap 4:tap
+4251 2:tap 3:tap
+4865 2:hold2400

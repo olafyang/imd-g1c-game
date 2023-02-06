@@ -1,0 +1,26 @@
+{
+  "levels": [
+    {
+      "name": "metronome",
+      "displayName": "Metronome",
+      "meta": {
+        "lyrics": null,
+        "music": null,
+        "arrangement": null,
+        "vocal": null
+      },
+      "levels": ["easy"]
+    },
+    {
+      "name": "VIVIDVELOCITY",
+      "displayName": "VIVIDVELOCITY",
+      "meta": {
+        "lyrics": null,
+        "music": "Synthion",
+        "arrangement": "Synthion",
+        "vocal": "Synthion"
+      },
+      "levels": ["easy"]
+    }
+  ]
+}

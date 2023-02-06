@@ -1,4 +1,4 @@
-import * as p5 from "./p5.js";
+import "./p5.js";
 
 const btnDefaultStyle = {
   shape: "rect",
@@ -80,26 +80,12 @@ function mergeStyle(style1, style2) {
 
 export class UI {
   sketch;
-  elements;
+  elements = [];
 
-  constructor() {
-    this.elements = {};
-  }
-
-  addElement(uiElement) {
-    let id = 0;
-    do {
-      id = Math.floor(Math.random() * 1e6);
-    } while (this.elements[id] != undefined);
-    this.elements[id] = uiElement;
-    return id;
-  }
-
-  removeElement(id) {
-    if (this.elements[id] != undefined) {
-      delete this.elements[id];
-      return id;
-    } else return 0;
+  addElements(...elements) {
+    for (let el of elements) {
+      this.elements.push(el);
+    }
   }
 
   activate() {
@@ -109,7 +95,7 @@ export class UI {
   }
 }
 
-export default class UIElementFactory {
+export class UIElementFactory {
   context;
   constructor(context) {
     // Assumes global mdoe if no context given
@@ -120,20 +106,61 @@ export default class UIElementFactory {
     }
   }
 
+  newText(
+    text,
+    posX,
+    posY,
+    size,
+    strokeWeight = 0,
+    strokeColor = "#000000",
+    fillColor = "#000000",
+    textStyle = this.context.NORMAL,
+    textAlign = this.context.LEFT
+  ) {
+    return new Text(
+      this.context,
+      text,
+      posX,
+      posY,
+      size,
+      strokeWeight,
+      strokeColor,
+      fillColor,
+      textStyle,
+      textAlign
+    );
+  }
+
   newButton(
+    label,
     type,
     posX,
     posY,
     width,
     height,
-    {
-      onPressCallback = () => {},
-      onReleaseCallback = () => {},
-      isVisible = true,
-      isEnabled = true,
-      style = btnDefaultStyle,
-    }
+    onPressCallback = () => {},
+    onReleaseCallback = () => {},
+    isVisible = true,
+    isEnabled = true,
+    style = btnDefaultStyle
   ) {
+    if (label) {
+      style = mergeStyle(style, {
+        normal: {
+          textLabel: label,
+        },
+        pressed: {
+          textLabel: label,
+        },
+        hover: {
+          textLabel: label,
+        },
+        disabled: {
+          textLabel: label,
+        },
+      });
+    }
+
     return new Button(
       this.context,
       type,
@@ -183,10 +210,63 @@ export default class UIElementFactory {
   }
 }
 
-class UIElement {
+export class UIElement {
   context;
   constructor(context) {
     this.context = context;
+  }
+}
+
+class Text extends UIElement {
+  text;
+  posX;
+  posY;
+  size;
+  strokeWeight;
+  strokeColor;
+  fillColor;
+  textStyle;
+  textAlign;
+
+  constructor(
+    context,
+    text,
+    posX,
+    posY,
+    size,
+    strokeWeight,
+    strokeColor,
+    fillColor,
+    textStyle,
+    textAlign
+  ) {
+    super(context);
+
+    this.text = text;
+    this.posX = posX;
+    this.posY = posY;
+    this.size = size;
+    this.strokeWeight = strokeWeight;
+    this.strokeColor = strokeColor;
+    this.fillColor = fillColor;
+    this.textStyle = textStyle;
+    this.textAlign = textAlign;
+  }
+
+  activate() {
+    this.context.push();
+    this.context.translate(this.posX, this.posY);
+    //
+    this.context.strokeWeight(this.strokeWeight);
+    this.context.stroke(this.strokeColor);
+    this.context.fill(this.fillColor);
+    this.context.textSize(this.size);
+    this.context.textStyle(this.textStyle);
+    this.context.textAlign(this.textAlign);
+
+    this.context.text(this.text, 0, 0);
+    //
+    this.context.pop();
   }
 }
 

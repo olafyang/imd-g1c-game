@@ -1,29 +1,88 @@
-import UIElementFactory from "./ui.js";
-// import * as p5 from "./p5.js";
-// import "./p5.sound.js"
+import { UIElementFactory, UI } from "./ui.js";
+import "./p5.sound.js";
+import * as SCREEN_STATE from "./screenState.js";
 
-// const tapSfx = loadSound("assets/sfx/CYCdh_ElecK01-Snr03.wav")
+let screenState = SCREEN_STATE.MAIN_MENU;
+let screenTransitionState = 0;
 
 const keyMap = {
-  0: 83,
-  1: 68,
-  2: 70,
-  3: 74,
-  4: 75,
-  5: 76,
+  gameInput: {
+    0: 83,
+    1: 68,
+    2: 70,
+    3: 74,
+    4: 75,
+    5: 76,
+  },
+  escape: 27,
+  enter: 13,
+  arrowUp: 38,
+  arrowDown: 40,
+  arrowLeft: 37,
+  arrowRight: 39,
 };
+
 let activeKeypress = [];
+
+// fetch levels
+let availableLevels = [];
+fetch("/levels.json")
+  .then((res) => {
+    if (!res.ok) {
+      throw Error("Error fetching levels");
+    }
+    return res.json();
+  })
+  .then((data) => {
+    availableLevels = data.levels;
+  })
+  .catch((err) => {
+    // TODO Handle error and display message
+  });
 
 new p5((sketch) => {
   const factory = new UIElementFactory(sketch);
+  const titleUI = new UI();
+  let gameTitle;
+  let playBtn;
 
-  const btn0 = factory.newButton("rect", 100, 100, 100, 50, {});
-  const slider0 = factory.newSlider(100, 200, 200, 20, "horizontal", 0, {});
-  const slider1 = factory.newSlider(150, 300, 200, 20, "vertical", 0, {});
+  let soundPressEmpty;
+
+  sketch.preload = function () {
+    sketch.soundFormats("mp3");
+    soundPressEmpty = sketch.loadSound("/assets/sfx/emptyTap.mp3");
+  };
 
   sketch.setup = function () {
-    sketch.createCanvas(window.innerWidth, window.innerHeight);
+    sketch.createCanvas(600, window.innerHeight);
     sketch.background(20);
+
+    // initialize UI
+
+    // main menu
+    gameTitle = factory.newText(
+      "Rhythm Game",
+      sketch.width / 2,
+      200,
+      50,
+      0,
+      "#ffffff",
+      "#ffffff",
+      sketch.BOLD,
+      sketch.CENTER
+    );
+    playBtn = factory.newButton(
+      "Play Demo",
+      "rect",
+      sketch.width / 2 - 50,
+      300,
+      100,
+      50,
+      () => {
+        screenState = SCREEN_STATE.LOADING;
+      }
+    );
+    titleUI.addElements(gameTitle, playBtn);
   };
 
   sketch.draw = function () {
@@ -33,7 +92,7 @@ new p5((sketch) => {
     sketch.rect(0, 0, 600, sketch.height);
 
     for (let i = 0; i < 6; i++) {
-      if (activeKeypress.includes(keyMap[i])) {
+      if (activeKeypress.includes(keyMap.gameInput[i])) {
         sketch.fill("#65d4e6");
       } else {
         sketch.fill("#ffffff");
@@ -42,18 +101,22 @@ new p5((sketch) => {
     }
 
     sketch.fill(255);
-    sketch.text(activeKeypress, 200, 200);
-    btn0.activate();
-    slider0.activate();
-    slider1.activate();
+
+    // sketch.text(activeKeypress, 200, 100);
+    titleUI.activate();
   };
 
+  // Handle Keypress
   sketch.keyPressed = function (e) {
     if (activeKeypress.indexOf(e.keyCode) === -1) {
+      if (Object.values(keyMap.gameInput).includes(e.keyCode)) {
+        soundPressEmpty.play(0, 1, 0.1);
+      }
       activeKeypress.push(e.keyCode);
     }
   };
 
+  // Handle Key Release
   sketch.keyReleased = function (e) {
     const keyIndex = activeKeypress.indexOf(e.keyCode);
     if (keyIndex !== -1) {

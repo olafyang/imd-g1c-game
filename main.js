@@ -45,10 +45,22 @@ fetch("/levels.json")
   });
 
 new p5((sketch) => {
+  let judgementHeight;
+  let millisecondsPerPixel = 2.5;
+
   const factory = new UIElementFactory(sketch);
   const titleUI = new UI();
   let gameTitle;
   let playBtn;
+  let loadingText;
+  let countDown3;
+  let countDown2;
+  let countDown1;
+  let countDownGo;
+  let levelTime;
+
+  // gameplay variables
+  let levelStartTime;
 
   let soundPressEmpty;
 
@@ -60,6 +72,10 @@ new p5((sketch) => {
   sketch.setup = function () {
     sketch.createCanvas(600, window.innerHeight);
     sketch.background(20);
+    sketch.frameRate(60);
+
+    judgementHeight = sketch.height - 120;
+    console.log("judgementHeight: ", judgementHeight);
 
     // initialize UI
 
@@ -85,9 +101,75 @@ new p5((sketch) => {
       () => {
         screenState = SCREEN_STATE.LOADING;
 
-        currentLevel = availableLevels[0].loadLevel(sketch, "easy");
+        availableLevels[0]
+          .loadLevel(sketch, "easy", millisecondsPerPixel)
+          .then((level) => {
+            currentLevel = level;
+            screenState = SCREEN_STATE.GAME;
+            levelStartTime = Date.now();
+          });
       }
     );
+
+    // Loading
+    loadingText = factory.newText(
+      "Loading",
+      sketch.width / 2,
+      200,
+      50,
+      0,
+      "#ffffff",
+      "#ffffff",
+      sketch.BOLD,
+      sketch.CENTER
+    );
+
+    // Game
+    countDown3 = factory.newText(
+      "3",
+      sketch.width / 2,
+      200,
+      50,
+      0,
+      "#ffffff",
+      "#ffffff",
+      sketch.BOLD,
+      sketch.CENTER
+    );
+    countDown2 = factory.newText(
+      "2",
+      sketch.width / 2,
+      200,
+      50,
+      0,
+      "#ffffff",
+      "#ffffff",
+      sketch.BOLD,
+      sketch.CENTER
+    );
+    countDown1 = factory.newText(
+      "1",
+      sketch.width / 2,
+      200,
+      50,
+      0,
+      "#ffffff",
+      "#ffffff",
+      sketch.BOLD,
+      sketch.CENTER
+    );
+    countDownGo = factory.newText(
+      "GO!",
+      sketch.width / 2,
+      200,
+      50,
+      0,
+      "#ffffff",
+      "#ffffff",
+      sketch.BOLD,
+      sketch.CENTER
+    );
+
     titleUI.addElements(gameTitle, playBtn);
   };
 
@@ -97,28 +179,52 @@ new p5((sketch) => {
     sketch.fill("#222845");
     sketch.rect(0, 0, 600, sketch.height);
 
-    for (let i = 0; i < 6; i++) {
-      if (activeKeypress.includes(keyMap.gameInput[i])) {
-        sketch.fill("#65d4e6");
-      } else {
-        sketch.fill("#ffffff");
-      }
-      sketch.rect(100 * i, sketch.height - 125, 100, 50);
-    }
-
     sketch.fill(255);
 
     // sketch.text(activeKeypress, 200, 100);
     if (screenState === SCREEN_STATE.MAIN_MENU) {
       titleUI.activate();
     }
+
+    if (screenState === SCREEN_STATE.LOADING) {
+      loadingText.activate();
+    }
+
+    if (screenState === SCREEN_STATE.GAME) {
+      for (let i = 0; i < 6; i++) {
+        if (activeKeypress.includes(keyMap.gameInput[i])) {
+          sketch.fill("#65d4e6");
+        } else {
+          sketch.fill("#ffffff");
+        }
+        sketch.rect(100 * i, judgementHeight, 100, 50);
+      }
+
+      levelTime = Date.now() - levelStartTime;
+
+      if (levelTime < 1000) {
+        countDown3.activate();
+      } else if (levelTime < 2000) {
+        countDown2.activate();
+      } else if (levelTime < 3000) {
+        countDown1.activate();
+      } else if (levelTime < 3500) {
+        countDownGo.activate();
+      } else {
+        currentLevel.play(levelStartTime, millisecondsPerPixel);
+      }
+
+      sketch.text(Date.now() - levelStartTime, 100, 100);
+    }
   };
 
   // Handle Keypress
   sketch.keyPressed = function (e) {
     if (activeKeypress.indexOf(e.keyCode) === -1) {
-      if (Object.values(keyMap.gameInput).includes(e.keyCode)) {
-        soundPressEmpty.play(0, 1, 0.1);
+      if (screenState === SCREEN_STATE.GAME) {
+        if (Object.values(keyMap.gameInput).includes(e.keyCode)) {
+          soundPressEmpty.play(0, 1, 0.1);
+        }
       }
       activeKeypress.push(e.keyCode);
     }

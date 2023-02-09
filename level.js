@@ -97,6 +97,7 @@ export class Level {
   levelStartTime;
   millisecondsPerPixel;
   playhead;
+  ended = false;
 
   constructor(levelObj) {
     this.levelName = levelObj.name;
@@ -222,12 +223,12 @@ export class Level {
     this.playhead =
       Date.now() - this.levelStartTime - this.waitTimeBeforeStart - 3500;
 
-    if (!this.songFile.isPlaying() && this.playhead > 0) {
+    if (!this.songFile.isPlaying() && this.playhead > 0 && !this.ended) {
       this.songFile.play(0, 1, 0.15);
     }
 
     // Stop
-    if (this.playhead > this.lastLineTime + 5000) {
+    if (this.playhead > this.lastLineTime + 500) {
       this.songFile.stop();
       gameOverHandler();
     }

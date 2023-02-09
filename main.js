@@ -51,6 +51,7 @@ new p5((sketch) => {
   const factory = new UIElementFactory(sketch);
   const titleUI = new UI();
   let gameTitle;
+  let songCredit;
   let playBtn;
   let loadingText;
   let countDown3;
@@ -107,6 +108,17 @@ new p5((sketch) => {
       sketch.BOLD,
       sketch.CENTER
     );
+    songCredit = factory.newText(
+      "Song: VIVIDVELOCITY - Synthion",
+      sketch.width / 2,
+      260,
+      20,
+      0,
+      "#ffffff",
+      "#ffffff",
+      sketch.NORMAL,
+      sketch.CENTER
+    );
     playBtn = factory.newButton(
       "Play",
       "rect",
@@ -127,7 +139,7 @@ new p5((sketch) => {
       }
     );
 
-    titleUI.addElements(gameTitle, playBtn);
+    titleUI.addElements(gameTitle, songCredit, playBtn);
 
     // Loading
     loadingText = factory.newText(
@@ -264,10 +276,13 @@ new p5((sketch) => {
               combo++;
             } else if (grade === "good") {
               gameplayStats.good++;
+              combo = 0;
             } else if (grade === "bad") {
               gameplayStats.bad++;
+              combo = 0;
             } else if (grade === "miss") {
               gameplayStats.miss++;
+              combo = 0;
             }
 
             lastGrade = grade.toUpperCase();

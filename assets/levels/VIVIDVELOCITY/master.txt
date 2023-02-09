@@ -1,0 +1,56 @@
+2230 0:tap 1:tap
+2804 0:tap
+3295 1:tap
+3395 2:tap
+3495 3:tap
+3595 4:tap
+4485 2:tap
+4731 3:tap
+5170 5:tap
+5274 4:tap
+5385 3:tap
+5510 2:tap
+5745 1:tap
+6575 0:tap 5:tap
+7157 2:tap
+7280 3:tap
+7393 1:tap
+8232 2:tap 3:tap
+8465 4:tap 5:tap
+8800 0:tap 1:tap
+9030 1:tap
+9266 4:tap
+9615 2:tap
+9850 3:tap
+10085 4:tap
+10355 2:tap
+10915 1:tap
+11035 0:tap
+11977 4:tap
+12229 3:tap
+12665 2:tap
+12783 3:tap
+13012 2:tap
+13378 0:tap 1:tap
+14080 4:tap
+14655 3:tap
+14767 4:tap
+15010 5:tap
+15940 0:tap 1:tap
+16305 1:tap 2:tap
+16645 2:tap 3:tap
+17012 3:tap 4:tap
+17235 4:tap 5:tap
+17365 2:tap
+17400 3:tap
+17435 2:tap
+17470 3:tap
+17505 2:tap
+17540 3:tap
+17600 2:tap
+17635 3:tap
+17670 2:tap
+17705 3:tap
+17740 2:tap
+17775 3:tap
+17810 2:tap

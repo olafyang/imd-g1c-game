@@ -1,0 +1,90 @@
+2230 0:tap 1:tap
+2804 0:tap
+3395 2:tap
+5510 2:tap
+6575 0:tap
+8232 5:tap
+10085 4:tap
+11035 0:tap
+11977 4:tap
+12783 3:tap
+13012 2:tap
+13378 0:tap 1:tap
+14080 4:tap
+15010 5:tap
+15940 0:tap 1:tap
+17235 4:tap 5:tap
+17365 2:tap
+17840 2:tap 3:tap
+18785 1:tap
+19735 2:tap
+19990 4:tap
+20300 3:tap
+21512 0:tap
+21917 5:tap
+22283 1:tap
+22732 4:tap
+23813 2:tap
+24377 2:tap 3:tap
+24844 2:tap 3:tap
+25311 2:tap
+25784 3:tap
+26263 2:tap
+26730 3:tap
+27197 2:tap
+27670 3:tap
+28135 2:tap
+29070 0:tap
+29537 5:tap
+30005 0:tap
+30483 5:tap
+30942 0:tap
+31421 2:tap
+31767 5:tap
+32118 0:tap
+32821 3:tap
+33282 1:tap
+33767 4:tap
+34222 1:tap
+34695 4:tap
+35156 1:tap
+35630 4:tap
+36102 1:tap
+36572 4:tap
+37032 1:tap
+37505 4:tap
+37985 1:tap
+38797 2:tap
+39150 2:tap
+39495 3:tap
+39737 3:tap
+40325 0:tap
+40792 1:tap
+41265 2:tap
+41725 5:tap
+42216 4:tap
+42671 3:tap
+43138 2:tap
+43617 1:tap
+44078 0:tap
+44533 0:tap
+45005 1:tap
+45490 2:tap
+45955 3:tap
+46411 4:tap
+46762 5:tap
+48297 0:tap 5:tap
+48761 1:tap 4:tap
+49224 2:tap 3:tap
+49700 0:tap 1:tap
+50163 1:tap 2:tap
+50630 3:tap 4:tap
+51105 4:tap 5:tap
+51570 4:tap 5:tap
+52045 3:tap 4:tap
+52520 2:tap 3:tap
+52900 1:tap 2:tap
+53418 0:tap 1:tap
+53800 2:tap 3:tap
+54137 2:tap 3:tap
+54505 2:tap 3:tap

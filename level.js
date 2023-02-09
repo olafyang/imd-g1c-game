@@ -125,7 +125,7 @@ export class Level {
     return new Promise((resolve, reject) => {
       // load song file
       this.songFile = context.loadSound(
-        `/assets/levels/${this.levelName}/song.mp3`,
+        `assets/levels/${this.levelName}/song.mp3`,
         () => {
           // load entities
           fetch(`assets/levels/${this.levelName}/${difficulty}.txt`)

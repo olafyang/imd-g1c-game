@@ -1,9 +1,11 @@
 import { UIElementFactory, UI } from "./ui.js";
+import { Level } from "./level.js";
 import "./p5.sound.js";
 import * as SCREEN_STATE from "./screenState.js";
 
 let screenState = SCREEN_STATE.MAIN_MENU;
 let screenTransitionState = 0;
+let currentLevel;
 
 const keyMap = {
   gameInput: {
@@ -34,7 +36,9 @@ fetch("/levels.json")
     return res.json();
   })
   .then((data) => {
-    availableLevels = data.levels;
+    for (let lvl of data.levels) {
+      availableLevels.push(new Level(lvl));
+    }
   })
   .catch((err) => {
     // TODO Handle error and display message
@@ -80,6 +84,8 @@ new p5((sketch) => {
       50,
       () => {
         screenState = SCREEN_STATE.LOADING;
+
+        currentLevel = availableLevels[0].loadLevel(sketch, "easy");
       }
     );
     titleUI.addElements(gameTitle, playBtn);
@@ -103,7 +109,9 @@ new p5((sketch) => {
     sketch.fill(255);
 
     // sketch.text(activeKeypress, 200, 100);
-    titleUI.activate();
+    if (screenState === SCREEN_STATE.MAIN_MENU) {
+      titleUI.activate();
+    }
   };
 
   // Handle Keypress

@@ -28,7 +28,7 @@ let activeKeypress = [];
 
 // fetch levels
 let availableLevels = [];
-fetch("/levels.json")
+fetch("levels.json")
   .then((res) => {
     if (!res.ok) {
       throw Error("Error fetching levels");
@@ -85,7 +85,7 @@ new p5((sketch) => {
 
   sketch.preload = function () {
     sketch.soundFormats("mp3");
-    soundPressEmpty = sketch.loadSound("/assets/sfx/emptyTap.mp3");
+    soundPressEmpty = sketch.loadSound("assets/sfx/emptyTap.mp3");
   };
 
   sketch.setup = function () {

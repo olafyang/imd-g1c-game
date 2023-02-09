@@ -128,7 +128,7 @@ export class Level {
         `/assets/levels/${this.levelName}/song.mp3`,
         () => {
           // load entities
-          fetch(`/assets/levels/${this.levelName}/${difficulty}.txt`)
+          fetch(`assets/levels/${this.levelName}/${difficulty}.txt`)
             .then((res) => {
               if (!res.ok) {
                 reject(

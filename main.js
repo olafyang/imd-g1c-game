@@ -46,7 +46,7 @@ fetch("/levels.json")
 
 new p5((sketch) => {
   let judgementHeight;
-  let millisecondsPerPixel = 4;
+  let millisecondsPerPixel = 2;
 
   const factory = new UIElementFactory(sketch);
   const titleUI = new UI();
@@ -58,8 +58,26 @@ new p5((sketch) => {
   let countDown1;
   let countDownGo;
   let levelTime;
+  let gameplayStats = {
+    perfect: 0,
+    great: 0,
+    good: 0,
+    bad: 0,
+    miss: 0,
+  };
+  let resultsUI = new UI();
+  let resultsTitle;
+  let resultsCombo;
+  let resultsPerfect;
+  let resultsGreat;
+  let resultsGood;
+  let resultsBad;
+  let resultsMiss;
+  let resultsReplayBtn;
 
   // gameplay variables
+  let lastGrade;
+  let combo = 0;
   let levelStartTime;
 
   let soundPressEmpty;
@@ -75,8 +93,6 @@ new p5((sketch) => {
     sketch.frameRate(60);
 
     judgementHeight = sketch.height - 120;
-    console.log("judgementHeight: ", judgementHeight);
-
     // initialize UI
 
     // main menu
@@ -92,7 +108,7 @@ new p5((sketch) => {
       sketch.CENTER
     );
     playBtn = factory.newButton(
-      "Play Demo",
+      "Play",
       "rect",
       sketch.width / 2 - 50,
       300,
@@ -101,7 +117,7 @@ new p5((sketch) => {
       () => {
         screenState = SCREEN_STATE.LOADING;
 
-        availableLevels[0]
+        availableLevels[1]
           .loadLevel(sketch, "easy", millisecondsPerPixel)
           .then((level) => {
             currentLevel = level;
@@ -110,6 +126,8 @@ new p5((sketch) => {
           });
       }
     );
+
+    titleUI.addElements(gameTitle, playBtn);
 
     // Loading
     loadingText = factory.newText(
@@ -170,7 +188,19 @@ new p5((sketch) => {
       sketch.CENTER
     );
 
-    titleUI.addElements(gameTitle, playBtn);
+    resultsReplayBtn = factory.newButton(
+      "Play Again",
+      "rect",
+      sketch.width / 2 - 50,
+      450,
+      100,
+      50,
+      () => {
+        location.reload();
+      }
+    );
+
+    resultsUI.addElements(resultsReplayBtn);
   };
 
   sketch.draw = function () {
@@ -181,7 +211,6 @@ new p5((sketch) => {
 
     sketch.fill(255);
 
-    // sketch.text(activeKeypress, 200, 100);
     if (screenState === SCREEN_STATE.MAIN_MENU) {
       titleUI.activate();
     }
@@ -199,6 +228,16 @@ new p5((sketch) => {
           sketch.fill("#ffffff");
         }
         sketch.rect(100 * i, judgementHeight, 100, 50);
+
+        sketch.fill("#000000");
+        sketch.textSize(15);
+        sketch.textStyle(sketch.NORMAL);
+        sketch.textAlign(sketch.CENTER);
+        sketch.text(
+          String.fromCharCode(keyMap.gameInput[i]),
+          100 * i + 50,
+          judgementHeight + 30
+        );
       }
       sketch.pop();
 
@@ -213,10 +252,136 @@ new p5((sketch) => {
       } else if (levelTime < 3500) {
         countDownGo.activate();
       } else {
-        currentLevel.play(levelStartTime, millisecondsPerPixel);
+        currentLevel.play(
+          levelStartTime,
+          millisecondsPerPixel,
+          (grade) => {
+            if (grade === "perfect") {
+              gameplayStats.perfect++;
+              combo++;
+            } else if (grade === "great") {
+              gameplayStats.great++;
+              combo++;
+            } else if (grade === "good") {
+              gameplayStats.good++;
+            } else if (grade === "bad") {
+              gameplayStats.bad++;
+            } else if (grade === "miss") {
+              gameplayStats.miss++;
+            }
+
+            lastGrade = grade.toUpperCase();
+          },
+          () => {
+            screenState = SCREEN_STATE.RESULTS;
+          }
+        );
       }
 
-      sketch.text(Date.now() - levelStartTime, 100, 100);
+      // Display Combo & last grade
+      sketch.push();
+      sketch.textSize(20);
+      sketch.textStyle(sketch.BOLD);
+      sketch.textAlign(sketch.CENTER);
+
+      sketch.text("COMBO", 500, 350);
+      sketch.text(combo, 500, 375);
+      sketch.pop();
+    }
+
+    if (screenState == SCREEN_STATE.RESULTS) {
+      resultsTitle = factory.newText(
+        "Results",
+        sketch.width / 2,
+        200,
+        50,
+        0,
+        "#ffffff",
+        "#ffffff",
+        sketch.BOLD,
+        sketch.CENTER
+      );
+
+      resultsCombo = factory.newText(
+        `Combo: ${combo}`,
+        sketch.width / 2,
+        250,
+        20,
+        0,
+        "#ffffff",
+        "#ffffff",
+        sketch.NORMAL,
+        sketch.CENTER
+      );
+
+      resultsPerfect = factory.newText(
+        `Perfect: ${gameplayStats.perfect}`,
+        sketch.width / 2,
+        280,
+        20,
+        0,
+        "#ffffff",
+        "#23FF10",
+        sketch.NORMAL,
+        sketch.CENTER
+      );
+      resultsGreat = factory.newText(
+        `Great: ${gameplayStats.great}`,
+        sketch.width / 2,
+        310,
+        20,
+        0,
+        "#ffffff",
+        "#FFB017",
+        sketch.NORMAL,
+        sketch.CENTER
+      );
+      resultsGood = factory.newText(
+        `Good: ${gameplayStats.good}`,
+        sketch.width / 2,
+        340,
+        20,
+        0,
+        "#ffffff",
+        "#0BFFE9",
+        sketch.NORMAL,
+        sketch.CENTER
+      );
+      resultsBad = factory.newText(
+        `Bad: ${gameplayStats.bad}`,
+        sketch.width / 2,
+        370,
+        20,
+        0,
+        "#ffffff",
+        "#FF6B5D",
+        sketch.NORMAL,
+        sketch.CENTER
+      );
+      resultsMiss = factory.newText(
+        `Miss: ${gameplayStats.miss}`,
+        sketch.width / 2,
+        400,
+        20,
+        0,
+        "#ffffff",
+        "#F30009",
+        sketch.NORMAL,
+        sketch.CENTER
+      );
+      resultsUI.addElements(
+        resultsTitle,
+        resultsCombo,
+        resultsPerfect,
+        resultsGreat,
+        resultsGood,
+        resultsBad,
+        resultsMiss
+      );
+
+      // display results
+      resultsUI.activate();
+      // display replay btn
     }
   };
 

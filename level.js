@@ -37,7 +37,7 @@ class Lane {
     this.laneNr = laneNr;
   }
 
-  judgeNext(time) {
+  judgeNext(time, handler) {
     const nextEntity = this.entities[0];
     if (!nextEntity) return;
 
@@ -46,20 +46,19 @@ class Lane {
     if (delay < -600 || nextEntity === undefined) return;
 
     if (Math.abs(delay) < 50) {
-      console.log("Perfect");
+      handler("perfect");
     } else if (Math.abs(delay) < 100) {
-      console.log("Great");
+      handler("great");
     } else if (Math.abs(delay) < 200) {
-      console.log("Good");
+      handler("good");
     } else {
-      console.log("Bad");
+      handler("bad");
     }
     this.entities.splice(0, 1);
   }
 
   missedNext() {
     this.entities.splice(0, 1);
-    console.log("Missed");
   }
 
   addEntity(entity) {
@@ -92,6 +91,8 @@ export class Level {
   lanes;
 
   // Gameplay Resources
+  judgeHandler;
+  lastLineTime;
   waitTimeBeforeStart;
   levelStartTime;
   millisecondsPerPixel;
@@ -153,6 +154,7 @@ export class Level {
                     // parse time
                     if (newLine) {
                       time = Number(word);
+                      this.lastLineTime = time;
                       newLine = false;
                     } else {
                       // parse entities
@@ -206,12 +208,13 @@ export class Level {
       rawTime - this.levelStartTime - this.waitTimeBeforeStart - 3500;
 
     if (levelTime) {
-      this.lanes[lane].judgeNext(levelTime);
+      this.lanes[lane].judgeNext(levelTime, this.judgeHandler);
     }
   }
 
-  play(levelStartTime, millisecondsPerPixel) {
+  play(levelStartTime, millisecondsPerPixel, judgeHandler, gameOverHandler) {
     if (!this.levelStartTime) {
+      this.judgeHandler = judgeHandler;
       this.levelStartTime = levelStartTime;
       this.millisecondsPerPixel = millisecondsPerPixel;
     }
@@ -221,6 +224,12 @@ export class Level {
 
     if (!this.songFile.isPlaying() && this.playhead > 0) {
       this.songFile.play(0, 1, 0.15);
+    }
+
+    // Stop
+    if (this.playhead > this.lastLineTime + 5000) {
+      this.songFile.stop();
+      gameOverHandler();
     }
 
     this.context.push();
@@ -241,6 +250,7 @@ export class Level {
 
         if (entityY - 25 > this.context.height) {
           lane.missedNext();
+          this.judgeHandler("miss");
         }
         this.context.rect(entityX, entityY - 25, 100 * entity.width, 50);
       }
@@ -248,9 +258,5 @@ export class Level {
 
     //
     this.context.pop();
-  }
-
-  [Symbol.iterator]() {
-    let index = -1;
   }
 }

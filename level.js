@@ -1,20 +1,20 @@
 class Entity {
   triggerTime;
   width;
-
-  constructor(triggerTime, width) {
-    this.triggerTime = triggerTime;
-    this.width = width;
-  }
-}
-
-class TapEntity extends Entity {
-  // Represents a sigle tap entity
   link;
 
   constructor(triggerTime, width, link) {
-    super(triggerTime, width);
+    this.triggerTime = triggerTime;
+    this.width = width;
     this.link = link;
+  }
+
+  clearLinkedEntities() {}
+}
+
+class TapEntity extends Entity {
+  constructor(triggerTime, width, link) {
+    super(triggerTime, width, link);
   }
 }
 
@@ -35,6 +35,31 @@ class Lane {
 
   constructor(laneNr) {
     this.laneNr = laneNr;
+  }
+
+  judgeNext(time) {
+    const nextEntity = this.entities[0];
+    if (!nextEntity) return;
+
+    const delay = time - nextEntity.triggerTime;
+
+    if (delay < -600 || nextEntity === undefined) return;
+
+    if (Math.abs(delay) < 50) {
+      console.log("Perfect");
+    } else if (Math.abs(delay) < 100) {
+      console.log("Great");
+    } else if (Math.abs(delay) < 200) {
+      console.log("Good");
+    } else {
+      console.log("Bad");
+    }
+    this.entities.splice(0, 1);
+  }
+
+  missedNext() {
+    this.entities.splice(0, 1);
+    console.log("Missed");
   }
 
   addEntity(entity) {
@@ -70,6 +95,7 @@ export class Level {
   waitTimeBeforeStart;
   levelStartTime;
   millisecondsPerPixel;
+  playhead;
 
   constructor(levelObj) {
     this.levelName = levelObj.name;
@@ -134,9 +160,9 @@ export class Level {
                       const lane = entity[0];
                       const type = entity[1];
                       let width = 1;
-                      if (entity.length > 2) {
-                        width = Number(entity[2]);
-                      }
+                      // if (entity.length > 2) {
+                      //   width = Number(entity[2]);
+                      // }
 
                       if (type === "tap") {
                         this.lanes[lane].addEntity(
@@ -175,25 +201,34 @@ export class Level {
     });
   }
 
+  judge(lane, rawTime) {
+    const levelTime =
+      rawTime - this.levelStartTime - this.waitTimeBeforeStart - 3500;
+
+    if (levelTime) {
+      this.lanes[lane].judgeNext(levelTime);
+    }
+  }
+
   play(levelStartTime, millisecondsPerPixel) {
     if (!this.levelStartTime) {
       this.levelStartTime = levelStartTime;
       this.millisecondsPerPixel = millisecondsPerPixel;
     }
 
-    let playhead =
+    this.playhead =
       Date.now() - this.levelStartTime - this.waitTimeBeforeStart - 3500;
 
-    if (!this.songFile.isPlaying() && playhead > 0) {
-      this.songFile.play();
+    if (!this.songFile.isPlaying() && this.playhead > 0) {
+      this.songFile.play(0, 1, 0.15);
     }
 
     this.context.push();
     //
     for (let lane of this.lanes) {
       let laneActiveEntities = lane.getActiveEntities(
-        playhead - 10000,
-        playhead + this.millisecondsPerPixel * this.context.height + 10000
+        this.playhead - 10000,
+        this.playhead + this.millisecondsPerPixel * this.context.height + 10000
       );
       const entityX = 100 * lane.laneNr;
 
@@ -201,11 +236,11 @@ export class Level {
         const entityY =
           this.context.height -
           60 -
-          (entity.triggerTime - playhead + 100) / this.millisecondsPerPixel;
-        if (entityY > this.context.height - 120) {
-          this.context.fill("#FF0B12");
-        } else {
-          this.context.fill("#ffffff");
+          (entity.triggerTime - this.playhead + 100) /
+            this.millisecondsPerPixel;
+
+        if (entityY - 25 > this.context.height) {
+          lane.missedNext();
         }
         this.context.rect(entityX, entityY - 25, 100 * entity.width, 50);
       }

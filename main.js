@@ -46,7 +46,7 @@ fetch("/levels.json")
 
 new p5((sketch) => {
   let judgementHeight;
-  let millisecondsPerPixel = 2.5;
+  let millisecondsPerPixel = 4;
 
   const factory = new UIElementFactory(sketch);
   const titleUI = new UI();
@@ -191,6 +191,7 @@ new p5((sketch) => {
     }
 
     if (screenState === SCREEN_STATE.GAME) {
+      sketch.push();
       for (let i = 0; i < 6; i++) {
         if (activeKeypress.includes(keyMap.gameInput[i])) {
           sketch.fill("#65d4e6");
@@ -199,6 +200,7 @@ new p5((sketch) => {
         }
         sketch.rect(100 * i, judgementHeight, 100, 50);
       }
+      sketch.pop();
 
       levelTime = Date.now() - levelStartTime;
 
@@ -223,6 +225,11 @@ new p5((sketch) => {
     if (activeKeypress.indexOf(e.keyCode) === -1) {
       if (screenState === SCREEN_STATE.GAME) {
         if (Object.values(keyMap.gameInput).includes(e.keyCode)) {
+          for (const [key, val] of Object.entries(keyMap.gameInput)) {
+            if (val === e.keyCode) {
+              currentLevel.judge(key, Date.now());
+            }
+          }
           soundPressEmpty.play(0, 1, 0.1);
         }
       }
